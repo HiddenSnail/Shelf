@@ -11,8 +11,8 @@ int main(int, char**) {
 
     bsoncxx::builder::stream::document document{};
 
-    auto collection = conn["testdb"]["testcollection"];
-    document << "hello" << "world";
+    auto collection = conn["mydb"]["mycollection"];
+    document << "Snail" << "Hello";
 
     collection.insert_one(document.view());
     auto cursor = collection.find({});
