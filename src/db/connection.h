@@ -9,14 +9,20 @@
 namespace Shelf {
 
 class Connection {
+protected:
+    std::string _uri;
 public:
-    Connection() {
+    Connection(std::string uri = "") : _uri(uri) {
         std::cout << "Connection::Create!" << std::endl;
     }
+
+    std::string getUri() { return _uri; }
+
     void print() {
         std::cout << "Connection::Op!" << std::endl;
     }
-    ~Connection() {
+
+    virtual ~Connection() {
         std::cout << "Connection::Delete!" << std::endl;
     }
 };

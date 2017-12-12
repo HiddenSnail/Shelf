@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <string>
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -9,27 +10,28 @@ namespace Shelf {
 template <class ContType>
 class ConnectionPool {
 private:
-    class ConnectionHolder;
+    class Holder;
 public:
-    typedef std::shared_ptr<ConnectionHolder> ConnectionHandler;
+    typedef std::shared_ptr<Holder> ConnectionHolder;
 private:
     static const int MAX_CONTS = 100;
     static const int MIN_CONTS = 10;
     std::vector<ContType*> _conts;
     int _busyHead; // first busy connetion index;
+    std::string _uri;
     std::mutex _mutex;
 
 private:
-    class ConnectionHolder : public std::enable_shared_from_this<ConnectionHolder> {
+    class Holder : public std::enable_shared_from_this<Holder> {
     private:
         ContType *_cont;
         ConnectionPool<ContType> *_pool;
     public:
-        ConnectionHolder(ContType *cont, ConnectionPool<ContType> *pool) : _cont(cont), _pool(pool) {}
+        Holder(ContType *cont, ConnectionPool<ContType> *pool) : _cont(cont), _pool(pool) {}
         ContType* getConnection() {
             return _cont;
         }
-        ~ConnectionHolder() {
+        ~Holder() {
             std::lock_guard<std::mutex> guard(_pool->_mutex);
             for (int i = _pool->_busyHead; i < _pool->_conts.size(); i++) {
                 if (_pool->_conts[i] == _cont) {
@@ -43,9 +45,9 @@ private:
     };
 
 private:
-    ConnectionPool(): _busyHead(MIN_CONTS) {
+    ConnectionPool(std::string uri): _busyHead(MIN_CONTS), _uri(uri) {
         for (int i = 0; i < MIN_CONTS; i++) {
-            _conts.emplace_back(new ContType);
+            _conts.emplace_back(new ContType(uri));
         }
     }
 
@@ -58,25 +60,25 @@ private:
             } else {
                 realNum = MAX_CONTS - _conts.size();
             }
-            _conts.insert(_conts.begin(), realNum, new ContType);
+            _conts.insert(_conts.begin(), realNum, new ContType(_uri));
             _busyHead += realNum;
         }
     }
 public:
-    static ConnectionPool* getInstance() {
-        static ConnectionPool *p = new ConnectionPool();
+    static ConnectionPool* getInstance(std::string uri) {
+        static ConnectionPool *p = new ConnectionPool(uri);
         return p;
     }
 
-    ConnectionHandler getConnectionHandler() {
+    ConnectionHolder getConnectionHolder() {
         std::lock_guard<std::mutex> guard(_mutex);
-        ConnectionHandler handler = nullptr;
+        ConnectionHolder handler = nullptr;
         if (_busyHead == 0) {
             extendPool();
         }
         if (_busyHead != 0) {
             int freeContIndex = _busyHead - 1;
-            handler = ConnectionHandler(new ConnectionHolder(_conts[freeContIndex], this));
+            handler = ConnectionHolder(new Holder(_conts[freeContIndex], this));
             _busyHead--;
         }
         return handler;

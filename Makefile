@@ -9,16 +9,20 @@ CXX = g++
 CXX_HEAD_FLAGS = --std=c++11
 CXX_END_FLAGS = `pkg-config --cflags --libs libmongocxx` -Wl,-rpath,/usr/local/lib
 
-OBJECT_S = connection.o main.o
+OBJECT_S = connection.o mongo_connection.o main.o
 
 shelf : $(OBJECT_S)
-	$(CXX) -o shelf.out $(OBJECT_S)
+	$(CXX) $(CXX_HEAD_FLAGS) -o shelf.out $(OBJECT_S) $(CXX_END_FLAGS)
 
 main.o : ./src/main.cpp
 	$(CXX) $(CXX_HEAD_FLAGS) -c -o main.o ./src/main.cpp $(CXX_END_FLAGS)
 
 connection.o : ./src/db/connection.h ./src/db/connection.cpp ./src/db/connection_pool.h
 	$(CXX) $(CXX_HEAD_FLAGS) -c -o connection.o ./src/db/connection.cpp $(CXX_END_FLAGS)
+
+mongo_connection.o : ./src/db/mongodb/mongo_connection.h ./src/db/mongodb/mongo_connection.cpp ./src/db/connection_pool.h
+	$(CXX) $(CXX_HEAD_FLAGS) -c -o mongo_connection.o ./src/db/mongodb/mongo_connection.cpp $(CXX_END_FLAGS)
+
 
 # connection_pool.o : ./src/db/connection_pool.h
 # 	$(CXX) $(CXX_HEAD_FLAGS) -c -o connection_pool.o ./src/db/connection_pool.h $(CXX_END_FLAGS)
