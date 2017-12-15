@@ -9,26 +9,15 @@ CXX = g++
 CXX_HEAD_FLAGS = --std=c++11
 CXX_END_FLAGS = `pkg-config --cflags --libs libmongocxx` -Wl,-rpath,/usr/local/lib
 
-OBJECT_S = connection.o mongo_connection.o main.o
+TARGET = shelf.out
+SRC = $(shell find ./src -name "*.cpp")
+OBJ = $(patsubst %.cpp, %.o, $(SRC)) 
 
-shelf : $(OBJECT_S)
-	$(CXX) $(CXX_HEAD_FLAGS) -o shelf.out $(OBJECT_S) $(CXX_END_FLAGS)
+$(TARGET) : $(OBJ)
+	$(CXX) $(CXX_HEAD_FLAGS) -o $@ $^ $(CXX_END_FLAGS)
 
-main.o : ./src/main.cpp
-	$(CXX) $(CXX_HEAD_FLAGS) -c -o main.o ./src/main.cpp $(CXX_END_FLAGS)
-
-connection.o : ./src/db/connection.h ./src/db/connection.cpp ./src/db/connection_pool.h
-	$(CXX) $(CXX_HEAD_FLAGS) -c -o connection.o ./src/db/connection.cpp $(CXX_END_FLAGS)
-
-mongo_connection.o : ./src/db/mongodb/mongo_connection.h ./src/db/mongodb/mongo_connection.cpp ./src/db/connection_pool.h
-	$(CXX) $(CXX_HEAD_FLAGS) -c -o mongo_connection.o ./src/db/mongodb/mongo_connection.cpp $(CXX_END_FLAGS)
-
-
-# connection_pool.o : ./src/db/connection_pool.h
-# 	$(CXX) $(CXX_HEAD_FLAGS) -c -o connection_pool.o ./src/db/connection_pool.h $(CXX_END_FLAGS)
-
-# debug.o : ./src/utils/debug.h
-# 	$(CXX) $(CXX_HEAD_FLAGS) -c -o debug.o ./src/utils/debug.h $(CXX_END_FLAGS)
+.cpp.o:
+	$(CXX) $(CXX_HEAD_FLAGS) -c -o $@ $< $(CXX_END_FLAGS)
 
 .PHONY : pkg
 pkg :
@@ -49,14 +38,14 @@ compile :
 	@echo compiling source code ...
 	@make pkg
 	@make push
-	@ssh $(SERVER_USR)@$(SERVER_IP) "cd $(SERVER_PROJECT_DIR) && make dpkg && make"
+	ssh $(SERVER_USR)@$(SERVER_IP) "cd $(SERVER_PROJECT_DIR) && make dpkg && make"
 	@echo compiling finish!
 
 .PHONY : run
 run : 
-	@ssh $(SERVER_USR)@$(SERVER_IP) "cd $(SERVER_PROJECT_DIR) && ./shelf.out"
+	@ssh $(SERVER_USR)@$(SERVER_IP) "cd $(SERVER_PROJECT_DIR) && ./$(TARGET)"
 
 .PHONY : clean
 clean : 
-	@ssh $(SERVER_USR)@$(SERVER_IP) "cd $(SERVER_PROJECT_DIR) && rm *.o"
+	@ssh $(SERVER_USR)@$(SERVER_IP) "cd $(SERVER_PROJECT_DIR) && rm $(OBJ)"
 	@echo clean finish!

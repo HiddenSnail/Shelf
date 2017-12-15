@@ -2,3 +2,6 @@
 *.out
 *.o
 *.vscode
+*/.idea
+others
+CMakeLists.txt
