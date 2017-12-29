@@ -2,16 +2,9 @@
 #include "./db/mongodb/mongo_connection.h"
 #include "./db/connection_pool.h"
 #include "./objs/user.h"
-#include "./access/mongodb/access.h"
+#include "./access/mongodb/all_access.h"
 #include "./access/access_proxy.h"
 #include <iostream>
-
-using bsoncxx::builder::stream::open_array;
-using bsoncxx::builder::stream::open_document;
-using bsoncxx::builder::stream::close_array;
-using bsoncxx::builder::stream::close_document;
-using bsoncxx::builder::stream::document;
-using bsoncxx::builder::stream::finalize;
 
 using namespace Shelf;
 using namespace Shelf::Mongodb;
@@ -19,8 +12,21 @@ using namespace Shelf::Mongodb;
 int main() {
     std::cout << "hello world" << std::endl;
     ConnectionPool<MongoConnection> *pool = ConnectionPool<MongoConnection>::getInstance("mongodb://localhost:27017");
-    AccessProxy<UserAccess> user_proxy(pool->getConnectionHolder());
-//    std::cout <<  << std::endl;
-    user_proxy.get("5a2ba1312f0d5b697b727632");
+    UserAccess userAccess(pool->getConnectionHolder());
+    BookAccess bookAccess(pool->getConnectionHolder());
+    Book book;
+    book._name = "Antusheng";
+    book._tag = "story";
+    Picture pic;
+    pic._title = "myfirst picture";
+    pic._url = "http://www.baidu.com";
+
+    Picture p1;
+    p1._title = "p1", p1._url = "url1";
+    Picture p2;
+    p2._title = "p2", p2._url = "url2";
+    std::vector<Picture> pics = { p1, p2 };
+    std::vector<Book> books = { book, book };
+    bookAccess.eraseByBookName("Antusheng");
     return 0;
 }

@@ -3,41 +3,48 @@
 #include "../../objs/user.h"
 #include "../../db/mongodb/mongo_connection.h"
 #include "../../db/connection_pool.h"
+#include "../access.h"
 
 namespace Shelf {
 namespace Mongodb {
 
+    using bsoncxx::builder::stream::document;
     using bsoncxx::builder::stream::open_array;
     using bsoncxx::builder::stream::open_document;
     using bsoncxx::builder::stream::close_array;
     using bsoncxx::builder::stream::close_document;
     using bsoncxx::builder::stream::finalize;
 
-    class UserAccess {
+    class UserAccess : public Access<MongoConnection> {
     public:
         typedef User DataType;
-        typedef ConnectionPool<MongoConnection>::ConnectionHolder ConnectionHolder;
     protected:
-        ConnectionHolder _holder;
-        mongocxx::collection _colletion;
-        UserAccess () { }
-        UserAccess(UserAccess::ConnectionHolder holder = nullptr);
+        mongocxx::collection _collection;
     public:
+        UserAccess(ConnectionHolder holder = nullptr);
         ~UserAccess();
-        void setConnectionHolder(UserAccess::ConnectionHolder holder);
-        UserAccess::ConnectionHolder getConnectionHolder() const;
-
-        bool isAccountExist(std::string email);
 
         /**
-         *  @note: should implement functions below, so that this class can be agented by AccessProxy.
-         *
+         * The base info include: _username, _email, _password
+         * @param user
+         * @return
          */
-        void save(const DataType &data);
-        void update(const DataType &data);
-        void erase(const DataType &data);
-        DataType get(std::string id);
-        std::vector<DataType> get(const DataType &filter);
+        bool updateBaseInfo(const UserAccess::DataType &user);
+        bool updateFriendIds(const std::string id, const std::vector<std::string> friendIds, UpdateOption option = Replace);
+        bool updateFriendIds(const UserAccess::DataType &user, UpdateOption option = Replace);
+        bool updateBookIds(const std::string id, const std::vector<std::string> bookIds, UpdateOption option = Replace);
+        bool updateBookIds(const UserAccess::DataType &user, UpdateOption option = Replace);
+
+        bool insert(UserAccess::DataType &user);
+        bool insert(std::vector<UserAccess::DataType> &userVec);
+
+        void erase(const std::string id);
+
+        UserAccess::DataType get(const std::string id);
+        UserAccess::DataType getByEmail(const std::string email);
+    private:
+        bsoncxx::document::value convertToDbValue(const UserAccess::DataType &user);
+        UserAccess::DataType convertFromDbValue(const bsoncxx::document::value &value);
     };
 }
 }
