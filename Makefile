@@ -6,8 +6,9 @@ SERVER_IP = 139.196.94.117
 SERVER_PROJECT_DIR = workspace/Shelf
 
 CXX = g++
-CXX_HEAD_FLAGS = --std=c++11
-CXX_END_FLAGS = `pkg-config --cflags --libs libmongocxx` -Wl,-rpath,/usr/local/lib
+CXX_INC = -I./src
+CXX_HEAD_FLAGS = --std=c++11 $(CXX_INC)
+CXX_END_FLAGS = `pkg-config --cflags --libs libmongocxx` -lboost_system -lpthread -Wl,-rpath,/usr/local/lib
 
 TARGET = shelf.out
 SRC = $(shell find ./src -name "*.cpp")

@@ -1,7 +1,19 @@
-#include "user_access.h"
+
+#include "access/mongodb/user_access.h"
+
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
 
 namespace Shelf {
 namespace Mongodb {
+
+    using bsoncxx::builder::stream::document;
+    using bsoncxx::builder::stream::open_array;
+    using bsoncxx::builder::stream::open_document;
+    using bsoncxx::builder::stream::close_array;
+    using bsoncxx::builder::stream::close_document;
+    using bsoncxx::builder::stream::finalize;
+
     UserAccess::UserAccess(Access::ConnectionHolder holder): Access(holder)
     {
         auto connection = holder->getConnection();

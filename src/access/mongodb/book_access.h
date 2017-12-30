@@ -1,19 +1,12 @@
 #pragma once
 
-#include "../../objs/book.h"
-#include "../../db/mongodb/mongo_connection.h"
-#include "../../db/connection_pool.h"
-#include "../access.h"
+#include "objs/book.h"
+#include "db/connection_pool.h"
+#include "db/mongodb/mongo_connection.h"
+#include "access/access.h"
 
 namespace Shelf {
 namespace Mongodb {
-
-    using bsoncxx::builder::stream::document;
-    using bsoncxx::builder::stream::open_array;
-    using bsoncxx::builder::stream::open_document;
-    using bsoncxx::builder::stream::close_array;
-    using bsoncxx::builder::stream::close_document;
-    using bsoncxx::builder::stream::finalize;
 
     class BookAccess: public Access<MongoConnection> {
     public:

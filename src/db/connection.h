@@ -4,7 +4,8 @@
 #include <string>
 #include <functional>
 #include <iostream>
-#include "connection_pool.h"
+
+#include "db/connection_pool.h"
 
 namespace Shelf {
 
