@@ -4,4 +4,5 @@
 *.vscode
 */.idea
 others
+src/cmake-build-debug
 CMakeLists.txt

@@ -31,10 +31,13 @@ private:
         ContType* getConnection() {
             return _cont;
         }
+
+        // 闲置的链接会放置在数组开头，一直碰到_busyHead才是被使用的连接
         ~Holder() {
             std::lock_guard<std::mutex> guard(_pool->_mutex);
             for (int i = _pool->_busyHead; i < _pool->_conts.size(); i++) {
                 if (_pool->_conts[i] == _cont) {
+                    // 将即将被回收的连接与第一个(_busyHead)的连接调换位置，然后将_busyHead往后移动
                     _pool->_conts[i] = _pool->_conts[_pool->_busyHead];
                     _pool->_conts[_pool->_busyHead] = _cont;
                     _pool->_busyHead++;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "objs/book.h"
 #include "db/connection_pool.h"
 #include "db/mongodb/mongo_connection.h"
@@ -25,6 +26,7 @@ namespace Mongodb {
         bool insert(std::vector<DataType> &bookVec);
 
         void erase(const std::string id);
+        void erase(const std::vector<std::string> ids);
         void eraseByBookName(const std::string name);
 
         DataType get(const std::string id);

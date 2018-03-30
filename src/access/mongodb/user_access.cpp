@@ -146,7 +146,7 @@ namespace Mongodb {
             }
             case Delete: {
                 opStr = "$pullAll";
-                auto bookIdArray = doc << "$set" << open_document << "book_ids" << open_array;
+                auto bookIdArray = doc << opStr << open_document << "book_ids" << open_array;
                 for (int i = 0; i < user._bookIds.size(); i++) {
                     bookIdArray << user._bookIds[i];
                 }
@@ -159,7 +159,7 @@ namespace Mongodb {
             }
             default: {
                 opStr = "$set";
-                auto bookIdArray = doc << "$set" << open_document << "book_ids" << open_array;
+                auto bookIdArray = doc << opStr << open_document << "book_ids" << open_array;
                 for (int i = 0; i < user._bookIds.size(); i++) {
                     bookIdArray << user._bookIds[i];
                 }

@@ -11,7 +11,7 @@ CXX_HEAD_FLAGS = --std=c++11 $(CXX_INC)
 CXX_END_FLAGS = `pkg-config --cflags --libs libmongocxx` -lboost_system -lpthread -Wl,-rpath,/usr/local/lib
 
 TARGET = shelf.out
-SRC = $(shell find ./src -name "*.cpp")
+SRC = $(shell find ./src -path "*debug" -prune -o -name "*.cpp" -print)
 OBJ = $(patsubst %.cpp, %.o, $(SRC)) 
 
 $(TARGET) : $(OBJ)

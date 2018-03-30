@@ -167,6 +167,14 @@ namespace Mongodb{
         this->_collection.delete_one(document{} << "_id" << bsoncxx::oid(id) << finalize);
     }
 
+    void BookAccess::erase(const std::vector<std::string> ids)
+    {
+        for (auto &ele: ids)
+        {
+            erase(ele);
+        }
+    }
+
     void BookAccess::eraseByBookName(const std::string name)
     {
         this->_collection.delete_one(document{} << "name" << name << finalize);
